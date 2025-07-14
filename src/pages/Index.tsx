@@ -1,9 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Video, Stethoscope, Trophy, Database, Bot, GraduationCap, Zap } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import doctorVsAi from "@/assets/doctor-vs-ai.jpg";
 
 const Index = () => {
+  const navigate = useNavigate();
+
   const steps = [
     {
       number: 1,
@@ -132,7 +135,7 @@ const Index = () => {
                 <Button 
                   size="lg" 
                   className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 font-semibold shadow-red hover:shadow-lg transition-all duration-300 hover:scale-105"
-                  onClick={() => window.location.href = '/quiz'}
+                  onClick={() => navigate("/quiz")}
                 >
                   Start Quiz vs AI
                 </Button>

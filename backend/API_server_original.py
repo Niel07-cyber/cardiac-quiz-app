@@ -59,7 +59,7 @@ def get_questions():
             questions = []
             for _, row in sampled.iterrows():
                 filename = f"{row['FileName']}.mp4"
-                video_url = f"http://127.0.0.1:5000/videos/{filename}"
+                video_url = f"http://127.0.0.1:5000/api/videos/{filename}"
                 questions.append({
                     "question": "What is the most likely EF value for this heart?",
                     "answers": ["Normal", "Reduced", "Abnormal"],
@@ -84,13 +84,24 @@ def get_questions():
         print(f"Error loading questions: {e}")
         return jsonify({"error": str(e)}), 500
 
-@app.route("/videos/<path:filename>")
+@app.route("/api/videos/<path:filename>")
 def serve_video(filename):
-    video_dir = os.path.join(os.path.dirname(__file__), "..", "public", "mp4")
-    if not os.path.exists(video_dir):
-        # Try original location
-        video_dir = os.path.join(os.path.dirname(__file__), "mp4")
-    return send_from_directory(video_dir, filename)
+    video_dir = os.path.join(os.path.dirname(__file__), "mp4")
+    video_path = os.path.join(video_dir, filename)
+    
+    # Check if video exists
+    if os.path.exists(video_path):
+        return send_from_directory(video_dir, filename)
+    else:
+        # Try alternative location
+        alt_video_dir = os.path.join(os.path.dirname(__file__), "..", "public", "mp4")
+        alt_video_path = os.path.join(alt_video_dir, filename)
+        if os.path.exists(alt_video_path):
+            return send_from_directory(alt_video_dir, filename)
+        else:
+            # Return error or placeholder
+            print(f"Video not found: {filename}")
+            return jsonify({"error": f"Video not found: {filename}"}), 404
 
 @app.route("/api/predict", methods=["POST"])
 def predict():

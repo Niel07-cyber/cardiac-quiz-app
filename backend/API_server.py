@@ -59,8 +59,7 @@ def get_questions():
             questions = []
             for _, row in sampled.iterrows():
                 filename = f"{row['FileName']}.mp4"
-                # Look for videos in the original project location
-                video_url = f"http://127.0.0.1:5000/videos/{filename}"
+                video_url = f"http://localhost:5000/api/videos/{filename}"
                 questions.append({
                     "question": "What is the most likely EF value for this heart?",
                     "answers": ["Normal", "Reduced", "Abnormal"],
@@ -85,24 +84,32 @@ def get_questions():
         print(f"Error loading questions: {e}")
         return jsonify({"error": str(e)}), 500
 
-@app.route("/videos/<path:filename>")
+@app.route("/api/videos/<path:filename>")
 def serve_video(filename):
-    # First try the original project location
-    original_video_dir = os.path.join(os.path.dirname(__file__), "..", "..", "..", "healthview-echogame-nextjs", "public", "mp4")
-    if os.path.exists(os.path.join(original_video_dir, filename)):
-        return send_from_directory(original_video_dir, filename)
+    # First try the public/mp4 directory since that's where the videos are
+    public_video_dir = os.path.join(os.path.dirname(__file__), "..", "public", "mp4")
+    public_video_path = os.path.join(public_video_dir, filename)
     
-    # Then try local public folder
-    video_dir = os.path.join(os.path.dirname(__file__), "..", "public", "mp4")
-    if os.path.exists(video_dir):
-        return send_from_directory(video_dir, filename)
+    print(f"Looking for video: {filename}")
+    print(f"Checking path: {public_video_path}")
     
-    # Finally try local mp4 folder
-    video_dir = os.path.join(os.path.dirname(__file__), "mp4")
-    if os.path.exists(video_dir):
-        return send_from_directory(video_dir, filename)
-    
-    return "Video not found", 404
+    if os.path.exists(public_video_path):
+        print(f"Found video at: {public_video_path}")
+        return send_from_directory(public_video_dir, filename)
+    else:
+        # Fallback to backend mp4 directory
+        backend_video_dir = os.path.join(os.path.dirname(__file__), "mp4")
+        backend_video_path = os.path.join(backend_video_dir, filename)
+        
+        if os.path.exists(backend_video_path):
+            print(f"Found video at backend location: {backend_video_path}")
+            return send_from_directory(backend_video_dir, filename)
+        else:
+            print(f"Video not found: {filename}")
+            print(f"Checked paths:")
+            print(f"  - {public_video_path}")
+            print(f"  - {backend_video_path}")
+            return jsonify({"error": f"Video not found: {filename}"}), 404
 
 @app.route("/api/predict", methods=["POST"])
 def predict():
