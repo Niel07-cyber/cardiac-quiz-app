@@ -17,7 +17,6 @@ const QuizPageOriginal: React.FC = () => {
   const [quizEnded, setQuizEnded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [answerSelected, setAnswerSelected] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<string>(""); // Add this line
   const [feedbackMessage, setFeedbackMessage] = useState("");
   const [showNextButton, setShowNextButton] = useState(false);
   const [incorrectAnswers, setIncorrectAnswers] = useState<any[]>([]);
@@ -92,16 +91,11 @@ const QuizPageOriginal: React.FC = () => {
     setStartTime(Date.now());
     
     try {
-      const response = await fetch('http://localhost:5000/api/questions');
+      const response = await fetch('/api/questions');
       if (!response.ok) {
         throw new Error('Failed to fetch questions');
       }
       const data = await response.json();
-      console.log('Received questions:', data);
-      // Log video URLs for debugging
-      data.forEach((q: any, index: number) => {
-        console.log(`Question ${index + 1} video URL:`, q.videoUrl);
-      });
       setQuestions(data);
     } catch (error) {
       console.error('Kunde inte hämta frågor:', error);
@@ -114,7 +108,7 @@ const QuizPageOriginal: React.FC = () => {
   // Get AI answer
   const getAIAnswer = async (questionObj: QuizQuestion): Promise<string> => {
     try {
-      const response = await fetch('http://localhost:5000/api/predict', {
+      const response = await fetch('/api/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -142,7 +136,6 @@ const QuizPageOriginal: React.FC = () => {
   // Select answer function
   const selectAnswer = async (selectedAnswer: string) => {
     setAnswerSelected(true);
-    setSelectedAnswer(selectedAnswer); // Track the selected answer
     const question = currentQuestion;
     const correctAnswer = question.correct;
     const isCorrect = selectedAnswer === correctAnswer;
@@ -191,7 +184,6 @@ const QuizPageOriginal: React.FC = () => {
     } else {
       setCurrentIndex(prev => prev + 1);
       setAnswerSelected(false);
-      setSelectedAnswer(""); // Reset selected answer
       setFeedbackMessage("");
       setShowNextButton(false);
     }
@@ -209,7 +201,7 @@ const QuizPageOriginal: React.FC = () => {
         timestamp: new Date().toLocaleString()
       };
 
-      const response = await fetch("http://localhost:5000/api/submit_results", {
+      const response = await fetch("/api/submit_results", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(result),
@@ -231,7 +223,6 @@ const QuizPageOriginal: React.FC = () => {
     setScore(0);
     setAiScore(0);
     setAnswerSelected(false);
-    setSelectedAnswer(""); // Reset selected answer
     setFeedbackMessage("");
     setShowNextButton(false);
     setIncorrectAnswers([]);
@@ -388,22 +379,10 @@ const QuizPageOriginal: React.FC = () => {
                               videoRef.current.playbackRate = playbackSpeed;
                             }
                           }}
-                          onError={(e) => {
-                            console.error('Video loading error:', e);
-                            console.error('Video URL that failed:', currentQuestion.videoUrl);
-                          }}
-                          onLoadStart={() => {
-                            console.log('Starting to load video:', currentQuestion.videoUrl);
-                          }}
                         >
                           <source src={currentQuestion.videoUrl} type="video/mp4" />
                           Din webbläsare stödjer inte video.
                         </video>
-                      )}
-                      {!currentQuestion.videoUrl && (
-                        <div className="w-full h-full flex items-center justify-center text-white">
-                          <p>No video available</p>
-                        </div>
                       )}
                     </div>
                   </Card>
@@ -423,22 +402,17 @@ const QuizPageOriginal: React.FC = () => {
                   {/* Answer Options */}
                   <div className="space-y-3">
                     {currentQuestion.answers.map((answer, index) => {
-                      const isSelected = answerSelected && answer === selectedAnswer;
-                      const isCorrect = answerSelected && answer === currentQuestion.correct;
-                      const isWrong = answerSelected && answer === selectedAnswer && answer !== currentQuestion.correct;
+                      const isSelected = answerSelected && answer === currentQuestion.correct;
+                      const isWrong = answerSelected && answer !== currentQuestion.correct;
                       const letters = ['A', 'B', 'C'];
                       
                       return (
                         <div
                           key={index}
                           className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                            isSelected && isCorrect
-                              ? 'border-green-500 bg-green-50' 
-                              : isWrong
-                              ? 'border-red-500 bg-red-50'
-                              : isCorrect && answerSelected
-                              ? 'border-green-500 bg-green-50'
-                              : answerSelected
+                            isSelected 
+                              ? 'border-red-500 bg-red-50' 
+                              : isWrong && answerSelected
                               ? 'border-gray-300 bg-gray-50 opacity-50'
                               : 'border-gray-200 hover:border-gray-300 bg-white'
                           }`}
@@ -447,41 +421,25 @@ const QuizPageOriginal: React.FC = () => {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                                isSelected && isCorrect
-                                  ? 'bg-green-500 text-white'
-                                  : isWrong
-                                  ? 'bg-red-500 text-white'
-                                  : isCorrect && answerSelected
-                                  ? 'bg-green-500 text-white'
+                                isSelected 
+                                  ? 'bg-red-500 text-white' 
                                   : 'bg-gray-100 text-gray-600'
                               }`}>
                                 {letters[index]}
                               </div>
                               <span className={`font-medium ${
-                                isSelected && isCorrect
-                                  ? 'text-green-700'
-                                  : isWrong
-                                  ? 'text-red-700'
-                                  : isCorrect && answerSelected
-                                  ? 'text-green-700'
-                                  : 'text-gray-900'
+                                isSelected ? 'text-red-700' : 'text-gray-900'
                               }`}>
                                 {answer}
                               </span>
                             </div>
                             
                             <div className={`w-5 h-5 rounded-full border-2 ${
-                              isSelected && isCorrect
-                                ? 'border-green-500 bg-green-500'
-                                : isWrong
-                                ? 'border-red-500 bg-red-500'
-                                : isCorrect && answerSelected
-                                ? 'border-green-500 bg-green-500'
-                                : isSelected
-                                ? 'border-red-500 bg-red-500'
+                              isSelected 
+                                ? 'border-red-500 bg-red-500' 
                                 : 'border-gray-300'
                             } flex items-center justify-center`}>
-                              {(isSelected || (isCorrect && answerSelected)) && (
+                              {isSelected && (
                                 <div className="w-2 h-2 bg-white rounded-full" />
                               )}
                             </div>
