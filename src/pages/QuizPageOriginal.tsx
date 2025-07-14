@@ -449,6 +449,50 @@ const QuizPageOriginal: React.FC = () => {
                     })}
                   </div>
 
+                  {/* Cardiac Phase Images - Always visible */}
+                  <div className="space-y-4">
+                    <h4 className="text-lg font-semibold text-gray-900">Cardiac Phases</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      {/* Systolic Image */}
+                      <div className="text-center">
+                        <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg aspect-square flex items-center justify-center mb-2">
+                          <img 
+                            src="/placeholder.svg" 
+                            alt="Systolic phase" 
+                            className="w-full h-full object-cover rounded-lg"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling.style.display = 'flex';
+                            }}
+                          />
+                          <div className="hidden w-full h-full items-center justify-center text-gray-500">
+                            <span className="text-sm">Systolic Image</span>
+                          </div>
+                        </div>
+                        <p className="text-sm font-medium text-gray-700">Systolic</p>
+                      </div>
+
+                      {/* Diastolic Image */}
+                      <div className="text-center">
+                        <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg aspect-square flex items-center justify-center mb-2">
+                          <img 
+                            src="/placeholder.svg" 
+                            alt="Diastolic phase" 
+                            className="w-full h-full object-cover rounded-lg"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.nextElementSibling.style.display = 'flex';
+                            }}
+                          />
+                          <div className="hidden w-full h-full items-center justify-center text-gray-500">
+                            <span className="text-sm">Diastolic Image</span>
+                          </div>
+                        </div>
+                        <p className="text-sm font-medium text-gray-700">Diastolic</p>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Feedback Message */}
                   {feedbackMessage && (
                     <div className={`p-4 rounded-lg ${

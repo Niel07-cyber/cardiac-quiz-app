@@ -86,6 +86,28 @@ const Index = () => {
               );
             })}
           </div>
+
+          {/* Data Source Section */}
+          <div className="mt-6">
+            <h3 className="text-lg font-semibold text-foreground mb-3">Data Source</h3>
+            <Card className="p-4 bg-blue-50 border-blue-200">
+              <div className="flex items-start gap-3">
+                <Database className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <h4 className="font-semibold text-sm mb-2 text-blue-900">Clinical Echocardiogram Dataset</h4>
+                  <p className="text-xs text-blue-800 leading-relaxed mb-1">
+                    The game uses authentic echocardiogram videos from clinical practice, sourced from validated medical datasets.
+                  </p>
+                  <div className="text-xs text-blue-700 space-y-1">
+                    <p>• <strong>200+ cardiac studies</strong> with validated measurements</p>
+                    <p>• <strong>EF values:</strong> Normal (&ge;55%), Reduced (40-54%), Abnormal (&lt;40%)</p>
+                    <p>• <strong>Video format:</strong> MP4, 112x112 resolution, optimized for web</p>
+                    <p>• <strong>Metadata:</strong> ESV, EDV, frame dimensions, FPS, frame count</p>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
         </div>
 
         {/* Game Features - Center Column */}
@@ -94,17 +116,17 @@ const Index = () => {
             <CardHeader className="pb-4">
               <CardTitle className="text-2xl text-center">Game Features</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               {features.map((feature) => {
                 const IconComponent = feature.icon;
                 return (
-                  <div key={feature.title} className="flex items-start gap-3 p-3 rounded-lg bg-background/10">
-                    <div className="w-6 h-6 text-primary flex-shrink-0 mt-0.5">
+                  <div key={feature.title} className="flex items-start gap-2 p-4 rounded-lg bg-background/10">
+                    <div className="w-5 h-5 text-primary flex-shrink-0 mt-0.5">
                       <IconComponent className="w-full h-full" />
                     </div>
-                    <div className="min-w-0">
-                      <h3 className="font-semibold text-sm mb-1">{feature.title}</h3>
-                      <p className="text-xs opacity-90 leading-relaxed">{feature.description}</p>
+                    <div className="min-w-0 flex-grow">
+                      <h3 className="font-semibold text-s mb-1">{feature.title}</h3>
+                      <p className="text-sm opacity-90 leading-relaxed">{feature.description}</p>
                     </div>
                   </div>
                 );
