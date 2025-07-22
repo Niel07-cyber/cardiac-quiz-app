@@ -94,9 +94,9 @@ const Index = () => {
               <div className="flex items-start gap-3">
                 <Database className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <div className="min-w-0">
-                  <h4 className="font-semibold text-sm mb-2 text-blue-900">Clinical Echocardiogram Dataset</h4>
+                  <h4 className="font-semibold text-sm mb-2 text-blue-900">Stansford Echocardiogram Dataset</h4>
                   <p className="text-xs text-blue-800 leading-relaxed mb-1">
-                    The game uses authentic echocardiogram videos from clinical practice, sourced from validated medical datasets.
+                    The game uses authentic echocardiogram videos from clinical practice, sourced from validated stansford medical datasets.
                   </p>
                   <div className="text-xs text-blue-700 space-y-1">
                     <p>• <strong>200+ cardiac studies</strong> with validated measurements</p>

@@ -26,6 +26,7 @@ const QuizPageOriginal: React.FC = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedTime, setElapsedTime] = useState<string>('0:00');
   const [currentTime, setCurrentTime] = useState<string>('0:00');
+  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
 
   const currentQuestion = questions[currentIndex];
 
@@ -98,7 +99,7 @@ const QuizPageOriginal: React.FC = () => {
       const data = await response.json();
       setQuestions(data);
     } catch (error) {
-      console.error('Kunde inte hämta frågor:', error);
+      console.error('Could not fetch questions:', error);
       // You could set some default questions here if needed
     } finally {
       setLoading(false);
@@ -108,6 +109,7 @@ const QuizPageOriginal: React.FC = () => {
   // Get AI answer
   const getAIAnswer = async (questionObj: QuizQuestion): Promise<string> => {
     try {
+      console.log('Making AI prediction request with metadata:', questionObj.metadata);
       const response = await fetch('/api/predict', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -122,33 +124,38 @@ const QuizPageOriginal: React.FC = () => {
       });
 
       if (!response.ok) {
+        console.error('API response not ok:', response.status, response.statusText);
         throw new Error('Prediction API failed');
       }
 
       const data = await response.json();
+      console.log('AI API response:', data);
       return data.prediction;
     } catch (error) {
       console.error('API error:', error);
-      return "Normal"; // fallback
+      // Return a random answer as fallback for now
+      const possibleAnswers = ["Normal", "Reduced", "Abnormal"];
+      const randomAnswer = possibleAnswers[Math.floor(Math.random() * possibleAnswers.length)];
+      console.log('Using random fallback answer:', randomAnswer);
+      return randomAnswer;
     }
   };
 
   // Select answer function
-  const selectAnswer = async (selectedAnswer: string) => {
+  const selectAnswer = (selectedAnswer: string) => {
+    if (answerSelected) return; // Prevent multiple selections
+    
+    setSelectedAnswer(selectedAnswer);
     setAnswerSelected(true);
     const question = currentQuestion;
     const correctAnswer = question.correct;
     const isCorrect = selectedAnswer === correctAnswer;
-
-    // Get AI answer
-    const aiAnswer = await getAIAnswer(question);
-    const aiCorrect = aiAnswer === correctAnswer;
-
+    
     if (isCorrect) {
       setScore(prev => prev + 1);
-      setFeedbackMessage("Rätt svar! 🎉");
+      setFeedbackMessage("Correct answer! 🎉");
     } else {
-      setFeedbackMessage(`Fel svar. Rätt svar var: ${correctAnswer}`);
+      setFeedbackMessage(`Wrong answer. Correct answer was: ${correctAnswer}`);
       
       // Generate explanation based on correct answer
       let explanation = "";
@@ -168,11 +175,25 @@ const QuizPageOriginal: React.FC = () => {
       }]);
     }
 
-    if (aiCorrect) {
-      setAiScore(prev => prev + 1);
-    }
-
+    // Show next button immediately
     setShowNextButton(true);
+
+    // Get AI answer in background - don't await this
+    console.log('Getting AI prediction for question:', question.question);
+    getAIAnswer(question)
+      .then(aiAnswer => {
+        console.log('AI prediction result:', aiAnswer, 'Correct answer:', correctAnswer);
+        const aiCorrect = aiAnswer === correctAnswer;
+        if (aiCorrect) {
+          console.log('AI got it correct! Updating AI score');
+          setAiScore(prev => prev + 1);
+        } else {
+          console.log('AI got it wrong. AI said:', aiAnswer, 'Correct was:', correctAnswer);
+        }
+      })
+      .catch(error => {
+        console.error('AI prediction error:', error);
+      });
   };
 
   // Next question function
@@ -184,6 +205,7 @@ const QuizPageOriginal: React.FC = () => {
     } else {
       setCurrentIndex(prev => prev + 1);
       setAnswerSelected(false);
+      setSelectedAnswer(null);
       setFeedbackMessage("");
       setShowNextButton(false);
     }
@@ -223,6 +245,7 @@ const QuizPageOriginal: React.FC = () => {
     setScore(0);
     setAiScore(0);
     setAnswerSelected(false);
+    setSelectedAnswer(null);
     setFeedbackMessage("");
     setShowNextButton(false);
     setIncorrectAnswers([]);
@@ -262,7 +285,7 @@ const QuizPageOriginal: React.FC = () => {
             <Card className="text-center p-8 shadow-elegant">
               <CardContent className="space-y-4">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary mx-auto"></div>
-                <p className="text-lg">Laddar frågor, vänligen vänta...</p>
+                <p className="text-lg">Loading questions, please wait...</p>
               </CardContent>
             </Card>
           </div>
@@ -381,7 +404,7 @@ const QuizPageOriginal: React.FC = () => {
                           }}
                         >
                           <source src={currentQuestion.videoUrl} type="video/mp4" />
-                          Din webbläsare stödjer inte video.
+                          Your browser does not support video.
                         </video>
                       )}
                     </div>
@@ -389,58 +412,78 @@ const QuizPageOriginal: React.FC = () => {
                 </div>
 
                 {/* Right Side - Answer Selection */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   <div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
                       Select Your Answer
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-600 text-xs">
                       Choose the most appropriate diagnosis based on the echocardiogram
                     </p>
                   </div>
 
                   {/* Answer Options */}
-                  <div className="space-y-3">
+                  <div className="space-y-2">
                     {currentQuestion.answers.map((answer, index) => {
-                      const isSelected = answerSelected && answer === currentQuestion.correct;
-                      const isWrong = answerSelected && answer !== currentQuestion.correct;
+                      const isUserSelected = selectedAnswer === answer;
+                      const isCorrect = answer === currentQuestion.correct;
+                      const showCorrect = answerSelected && isCorrect;
+                      const showIncorrect = answerSelected && isUserSelected && !isCorrect;
                       const letters = ['A', 'B', 'C'];
                       
                       return (
                         <div
                           key={index}
-                          className={`border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 ${
-                            isSelected 
-                              ? 'border-red-500 bg-red-50' 
-                              : isWrong && answerSelected
+                          className={`border-2 rounded-lg p-3 cursor-pointer transition-all duration-200 ${
+                            showCorrect
+                              ? 'border-green-500 bg-green-50' 
+                              : showIncorrect
+                              ? 'border-red-500 bg-red-50'
+                              : isUserSelected && !answerSelected
+                              ? 'border-blue-500 bg-blue-50'
+                              : answerSelected
                               ? 'border-gray-300 bg-gray-50 opacity-50'
                               : 'border-gray-200 hover:border-gray-300 bg-white'
                           }`}
                           onClick={() => !answerSelected && selectAnswer(answer)}
                         >
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                                isSelected 
-                                  ? 'bg-red-500 text-white' 
+                            <div className="flex items-center gap-2">
+                              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                                showCorrect
+                                  ? 'bg-green-500 text-white' 
+                                  : showIncorrect
+                                  ? 'bg-red-500 text-white'
+                                  : isUserSelected && !answerSelected
+                                  ? 'bg-blue-500 text-white'
                                   : 'bg-gray-100 text-gray-600'
                               }`}>
                                 {letters[index]}
                               </div>
-                              <span className={`font-medium ${
-                                isSelected ? 'text-red-700' : 'text-gray-900'
+                              <span className={`font-medium text-sm ${
+                                showCorrect
+                                  ? 'text-green-700' 
+                                  : showIncorrect
+                                  ? 'text-red-700'
+                                  : isUserSelected && !answerSelected
+                                  ? 'text-blue-700'
+                                  : 'text-gray-900'
                               }`}>
                                 {answer}
                               </span>
                             </div>
                             
-                            <div className={`w-5 h-5 rounded-full border-2 ${
-                              isSelected 
-                                ? 'border-red-500 bg-red-500' 
+                            <div className={`w-4 h-4 rounded-full border-2 ${
+                              showCorrect
+                                ? 'border-green-500 bg-green-500' 
+                                : showIncorrect
+                                ? 'border-red-500 bg-red-500'
+                                : isUserSelected
+                                ? 'border-blue-500 bg-blue-500'
                                 : 'border-gray-300'
                             } flex items-center justify-center`}>
-                              {isSelected && (
-                                <div className="w-2 h-2 bg-white rounded-full" />
+                              {(showCorrect || showIncorrect || isUserSelected) && (
+                                <div className="w-1.5 h-1.5 bg-white rounded-full" />
                               )}
                             </div>
                           </div>
@@ -450,42 +493,42 @@ const QuizPageOriginal: React.FC = () => {
                   </div>
 
                   {/* Cardiac Phase Images - Always visible */}
-                  <div className="space-y-4">
-                    <h4 className="text-lg font-semibold text-gray-900">Cardiac Phases</h4>
-                    <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <h4 className="text-base font-semibold text-gray-900">Cardiac Phases</h4>
+                    <div className="grid grid-cols-2 gap-3">
                       {/* Systolic Image */}
-                      <div className="text-center">
-                        <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg aspect-square flex items-center justify-center mb-2">
+                      <div className="flex flex-col items-center text-center">
+                        <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-2 overflow-hidden">
                           <img 
-                            src="/placeholder.svg" 
+                            src="/sistole1273.png" 
                             alt="Systolic phase" 
-                            className="w-full h-full object-cover rounded-lg"
+                            className="max-w-full max-h-36 rounded-lg"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                               e.currentTarget.nextElementSibling.style.display = 'flex';
                             }}
                           />
                           <div className="hidden w-full h-full items-center justify-center text-gray-500">
-                            <span className="text-sm">Systolic Image</span>
+                            <span className="text-sm text-gray-500">Systolic Phase</span>
                           </div>
                         </div>
                         <p className="text-sm font-medium text-gray-700">Systolic</p>
                       </div>
 
                       {/* Diastolic Image */}
-                      <div className="text-center">
-                        <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg aspect-square flex items-center justify-center mb-2">
+                      <div className="flex flex-col items-center text-center">
+                        <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-2 overflow-hidden">
                           <img 
-                            src="/placeholder.svg" 
+                            src="/diastole1.png" 
                             alt="Diastolic phase" 
-                            className="w-full h-full object-cover rounded-lg"
+                            className="max-w-full max-h-36 rounded-lg"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                               e.currentTarget.nextElementSibling.style.display = 'flex';
                             }}
                           />
                           <div className="hidden w-full h-full items-center justify-center text-gray-500">
-                            <span className="text-sm">Diastolic Image</span>
+                            <span className="text-sm text-gray-500">Diastolic Phase</span>
                           </div>
                         </div>
                         <p className="text-sm font-medium text-gray-700">Diastolic</p>
@@ -495,12 +538,12 @@ const QuizPageOriginal: React.FC = () => {
 
                   {/* Feedback Message */}
                   {feedbackMessage && (
-                    <div className={`p-4 rounded-lg ${
-                      feedbackMessage.includes('Rätt') 
+                    <div className={`p-3 rounded-lg ${
+                      feedbackMessage.includes('Correct') 
                         ? 'bg-green-50 border border-green-200 text-green-800' 
                         : 'bg-red-50 border border-red-200 text-red-800'
                     }`}>
-                      <p className="font-medium">{feedbackMessage}</p>
+                      <p className="font-medium text-sm">{feedbackMessage}</p>
                     </div>
                   )}
 
@@ -508,14 +551,14 @@ const QuizPageOriginal: React.FC = () => {
                   {showNextButton ? (
                     <Button 
                       onClick={nextQuestion}
-                      className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 text-lg"
+                      className="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 text-base"
                     >
                       {currentIndex + 1 >= questions.length ? "View Results" : "Next question"}
                     </Button>
                   ) : (
                     <Button 
                       disabled
-                      className="w-full bg-gray-300 text-gray-500 font-semibold py-3 text-lg cursor-not-allowed"
+                      className="w-full bg-gray-300 text-gray-500 font-semibold py-2.5 text-base cursor-not-allowed"
                     >
                       Next question
                     </Button>
