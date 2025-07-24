@@ -1,18 +1,10 @@
 {
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "functions": {
-    "api/questions.py": {
-      "runtime": "python3.12"
-    },
-    "api/predict.py": {
-      "runtime": "python3.12"
-    },
-    "api/submit_results.py": {
-      "runtime": "python3.12"
-    },
-    "api/index.py": {
-      "runtime": "python3.12"
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  }
+  ]
 }

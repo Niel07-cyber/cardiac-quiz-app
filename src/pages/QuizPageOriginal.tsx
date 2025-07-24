@@ -97,7 +97,8 @@ const QuizPageOriginal: React.FC = () => {
     setStartTime(Date.now());
     
     try {
-      const response = await fetch('/api/questions');
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+      const response = await fetch(`${backendUrl}/api/questions`);
       if (!response.ok) {
         throw new Error('Failed to fetch questions');
       }
@@ -115,7 +116,8 @@ const QuizPageOriginal: React.FC = () => {
   const getAIAnswer = async (questionObj: QuizQuestion): Promise<string> => {
     try {
       console.log('Making AI prediction request with metadata:', questionObj.metadata);
-      const response = await fetch('/api/predict', {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+      const response = await fetch(`${backendUrl}/api/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -244,7 +246,8 @@ const QuizPageOriginal: React.FC = () => {
         timestamp: new Date().toLocaleString()
       };
 
-      const response = await fetch("/api/submit_results", {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || '';
+      const response = await fetch(`${backendUrl}/api/submit_results`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(result),
