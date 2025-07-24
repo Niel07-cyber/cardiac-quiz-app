@@ -37,10 +37,5 @@
       "src": "/(.*)",
       "dest": "/dist/$1"
     }
-  ],
-  "functions": {
-    "api/*.py": {
-      "maxDuration": 10
-    }
-  }
+  ]
 }
