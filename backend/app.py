@@ -1,7 +1,8 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 import json
 import random
+import os
 from datetime import datetime
 
 app = Flask(__name__)
@@ -15,9 +16,50 @@ def index():
         "endpoints": [
             "/api/questions",
             "/api/predict", 
-            "/api/submit_results"
+            "/api/submit_results",
+            "/mp4/<filename>",
+            "/images/<filename>"
         ]
     })
+
+@app.route('/mp4/<filename>')
+def serve_video(filename):
+    """Serve MP4 video files"""
+    try:
+        video_path = os.path.join('mp4', filename)
+        if os.path.exists(video_path):
+            return send_file(video_path, mimetype='video/mp4')
+        else:
+            return jsonify({"error": "Video not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/images/<filename>')
+def serve_image(filename):
+    """Serve cardiac phase images (sistole, diastole, etc.)"""
+    try:
+        # Check multiple possible image directories
+        image_dirs = ['images', 'static/images', '.']
+        
+        for img_dir in image_dirs:
+            image_path = os.path.join(img_dir, filename)
+            if os.path.exists(image_path):
+                # Determine MIME type based on file extension
+                ext = filename.lower().split('.')[-1]
+                mime_types = {
+                    'jpg': 'image/jpeg',
+                    'jpeg': 'image/jpeg', 
+                    'png': 'image/png',
+                    'gif': 'image/gif',
+                    'bmp': 'image/bmp',
+                    'webp': 'image/webp'
+                }
+                mimetype = mime_types.get(ext, 'image/jpeg')
+                return send_file(image_path, mimetype=mimetype)
+        
+        return jsonify({"error": "Image not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/questions', methods=['GET'])
 def get_questions():
