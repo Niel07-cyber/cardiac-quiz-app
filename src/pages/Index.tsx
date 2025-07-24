@@ -54,7 +54,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Compact Header - Responsive */}
-      <header className="bg-primary text-primary-foreground py-4 sm:py-6 px-3 sm:px-4 shadow-elegant">
+      <header className="bg-primary text-primary-foreground py-2 sm:py-3 px-3 sm:px-4 shadow-elegant">
         <div className="container mx-auto text-center">
           <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">HealthEcho Game</h1>
           <p className="text-xs sm:text-sm opacity-90">Challenge AI in Medical Ultrasound Analysis</p>

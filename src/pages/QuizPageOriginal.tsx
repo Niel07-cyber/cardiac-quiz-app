@@ -1,4 +1,5 @@
 'use client';
+// Force cache refresh - timestamp: 2025-07-24-15:30:00
 
 import React, { useState, useEffect, useRef } from 'react';
 import { QuizQuestion, QuizResults } from '../types/quiz';
@@ -504,12 +505,12 @@ const QuizPageOriginal: React.FC = () => {
                             <>
                               <div className="flex items-center space-x-1">
                                 <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-blue-500 rounded-full"></div>
-                                <span className="text-xs font-medium text-blue-900">Frames</span>
+                                <span className="text-m font-medium text-blue-900">Frames</span>
                               </div>
                               <div className="flex items-center space-x-2 sm:space-x-3">
                                 <div className="bg-white bg-opacity-80 px-2 sm:px-3 py-1 sm:py-1.5 rounded border border-blue-200">
-                                  <span className="text-xs sm:text-sm font-medium text-blue-700">ES</span>
-                                  <span className="text-sm sm:text-lg font-bold text-blue-900 ml-1">{metadata.frameNumbers[0]}</span>
+                                  <span className="text-m sm:text-sm font-medium text-blue-700">ES</span>
+                                  <span className="text-m sm:text-lg font-bold text-blue-900 ml-1">{metadata.frameNumbers[0]}</span>
                                 </div>
                                 <div className="text-blue-400 text-xs sm:text-sm">•</div>
                                 <div className="bg-white bg-opacity-80 px-2 sm:px-3 py-1 sm:py-1.5 rounded border border-blue-200">
@@ -611,46 +612,46 @@ const QuizPageOriginal: React.FC = () => {
                     })}
                   </div>
 
-                  {/* Cardiac Phase Images - Responsive */}
+                  {/* Cardiac Phase Images - Containers Fit Image Size */}
                   <div className="space-y-2 px-2 lg:px-0">
                     <h4 className="text-sm sm:text-base font-semibold text-gray-900">Cardiac Phases</h4>
                     <div className="grid grid-cols-2 gap-2 sm:gap-3">
                       {/* Systolic Image */}
                       <div className="flex flex-col items-center text-center">
-                        <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-1 sm:mb-2 overflow-hidden w-full aspect-square max-h-24 sm:max-h-36">
+                        <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg inline-block overflow-hidden">
                           <img 
                             src="/sistole1273.png" 
                             alt="Systolic phase" 
-                            className="max-w-full max-h-full rounded-lg object-contain"
+                            className="block rounded-lg max-w-full h-auto"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                               e.currentTarget.nextElementSibling.style.display = 'flex';
                             }}
                           />
-                          <div className="hidden w-full h-full items-center justify-center text-gray-500">
+                          <div className="hidden w-20 h-20 items-center justify-center text-gray-500">
                             <span className="text-xs sm:text-sm text-gray-500">Systolic Phase</span>
                           </div>
                         </div>
-                        <p className="text-xs sm:text-sm font-medium text-gray-700">Systolic</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-700 mt-1">Systolic</p>
                       </div>
 
                       {/* Diastolic Image */}
                       <div className="flex flex-col items-center text-center">
-                        <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center mb-1 sm:mb-2 overflow-hidden w-full aspect-square max-h-24 sm:max-h-36">
+                        <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg inline-block overflow-hidden">
                           <img 
                             src="/diastole1.png" 
                             alt="Diastolic phase" 
-                            className="max-w-full max-h-full rounded-lg object-contain"
+                            className="block rounded-lg max-w-full h-auto"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                               e.currentTarget.nextElementSibling.style.display = 'flex';
                             }}
                           />
-                          <div className="hidden w-full h-full items-center justify-center text-gray-500">
+                          <div className="hidden w-20 h-20 items-center justify-center text-gray-500">
                             <span className="text-xs sm:text-sm text-gray-500">Diastolic Phase</span>
                           </div>
                         </div>
-                        <p className="text-xs sm:text-sm font-medium text-gray-700">Diastolic</p>
+                        <p className="text-xs sm:text-sm font-medium text-gray-700 mt-1">Diastolic</p>
                       </div>
                     </div>
                   </div>
