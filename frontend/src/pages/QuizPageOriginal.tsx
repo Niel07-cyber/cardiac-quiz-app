@@ -103,7 +103,16 @@ const QuizPageOriginal: React.FC = () => {
         throw new Error('Failed to fetch questions');
       }
       const data = await response.json();
-      setQuestions(data);
+      
+      // Fix video URLs by prefixing with backend URL if they're relative
+      const questionsWithFixedUrls = data.map((question: QuizQuestion) => ({
+        ...question,
+        videoUrl: question.videoUrl.startsWith('/') 
+          ? `${backendUrl}${question.videoUrl}` 
+          : question.videoUrl
+      }));
+      
+      setQuestions(questionsWithFixedUrls);
     } catch (error) {
       console.error('Could not fetch questions:', error);
       // You could set some default questions here if needed
