@@ -1,0 +1,48 @@
+{
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "api/questions.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/predict.py", 
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/submit_results.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/questions",
+      "dest": "/api/questions.py"
+    },
+    {
+      "src": "/api/predict",
+      "dest": "/api/predict.py"
+    },
+    {
+      "src": "/api/submit_results",
+      "dest": "/api/submit_results.py"
+    },
+    {
+      "src": "/mp4/(.*)",
+      "dest": "/public/mp4/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/dist/$1"
+    }
+  ],
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
+}
