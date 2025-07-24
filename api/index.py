@@ -1,8 +1,18 @@
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from flask import Flask, jsonify
 
-from backend.API_server_original import app
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return jsonify({
+        "message": "HealthEcho Cardiac Quiz API",
+        "status": "running",
+        "endpoints": [
+            "/api/questions",
+            "/api/predict", 
+            "/api/submit_results"
+        ]
+    })
 
 # Export the Flask app for Vercel
 def handler(request):

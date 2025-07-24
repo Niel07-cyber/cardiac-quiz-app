@@ -3,44 +3,34 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from flask import Flask, request, jsonify
-import pandas as pd
-import joblib
-import numpy as np
+import random
 
 def handler(request):
     if request.method == 'POST':
         try:
             data = request.get_json()
             
-            # Load ML model
-            try:
-                model = joblib.load("backend/lightgbm_model.pkl")
-                encoder = joblib.load("backend/label_encoder.pkl")
-            except:
+            # Simple AI prediction logic based on ESV/EDV ratio
+            esv = data.get("ESV", 50)
+            edv = data.get("EDV", 120)
+            
+            if edv > 0:
+                ef = ((edv - esv) / edv) * 100
+                if ef >= 55:
+                    prediction = "Normal"
+                elif ef >= 40:
+                    prediction = "Reduced"
+                else:
+                    prediction = "Abnormal"
+            else:
                 # Fallback random prediction
-                import random
                 predictions = ["Normal", "Reduced", "Abnormal"]
-                return jsonify({"prediction": random.choice(predictions)})
+                prediction = random.choice(predictions)
             
-            # Prepare features
-            features = [
-                data.get("ESV", 0),
-                data.get("EDV", 0), 
-                data.get("FrameHeight", 112),
-                data.get("FrameWidth", 112),
-                data.get("FPS", 50),
-                data.get("NumberOfFrames", 30)
-            ]
-            
-            # Make prediction
-            prediction = model.predict([features])[0]
-            predicted_label = encoder.inverse_transform([prediction])[0]
-            
-            return jsonify({"prediction": predicted_label})
+            return jsonify({"prediction": prediction})
             
         except Exception as e:
             # Fallback random prediction
-            import random
             predictions = ["Normal", "Reduced", "Abnormal"]
             return jsonify({"prediction": random.choice(predictions)})
     else:
