@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Video, Stethoscope, Trophy, Database, Bot, GraduationCap, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import doctorVsAi from "@/assets/doctor-vs-ai.jpg";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -145,7 +144,7 @@ const Index = () => {
               {/* Doctor vs AI Image - Responsive */}
               <div className="mb-3 sm:mb-4">
                 <img 
-                  src={doctorVsAi} 
+                  src="/doctor-vs-ai.jpg" 
                   alt="Doctor challenging AI" 
                   className="w-full h-32 sm:h-48 object-cover rounded-lg shadow-md"
                 />
