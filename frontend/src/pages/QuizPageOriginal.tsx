@@ -632,7 +632,7 @@ const QuizPageOriginal: React.FC = () => {
                       <div className="flex flex-col items-center text-center">
                         <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg inline-block overflow-hidden">
                           <img 
-                            src="/sistole1273.png" 
+                            src={`${import.meta.env.VITE_BACKEND_URL || ''}/images/sistole1273.png`}
                             alt="Systolic phase" 
                             className="block rounded-lg max-w-full h-auto"
                             onError={(e) => {
@@ -651,7 +651,7 @@ const QuizPageOriginal: React.FC = () => {
                       <div className="flex flex-col items-center text-center">
                         <div className="bg-gray-200 border-2 border-dashed border-gray-300 rounded-lg inline-block overflow-hidden">
                           <img 
-                            src="/diastole1.png" 
+                            src={`${import.meta.env.VITE_BACKEND_URL || ''}/images/diastole1.png`}
                             alt="Diastolic phase" 
                             className="block rounded-lg max-w-full h-auto"
                             onError={(e) => {

@@ -144,7 +144,7 @@ const Index = () => {
               {/* Doctor vs AI Image - Responsive */}
               <div className="mb-3 sm:mb-4">
                 <img 
-                  src="/doctor-vs-ai.jpg" 
+                  src={`${import.meta.env.VITE_BACKEND_URL || ''}/images/doctor-vs-ai.jpg`}
                   alt="Doctor challenging AI" 
                   className="w-full h-32 sm:h-48 object-cover rounded-lg shadow-md"
                 />
