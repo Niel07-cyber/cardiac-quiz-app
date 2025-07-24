@@ -1,0 +1,40 @@
+# Exclude large video files to prevent OOM during deployment
+public/mp4/*.mp4
+
+# Exclude backend files not needed for Vercel deployment
+backend/
+*.pkl
+*.csv
+*.txt
+*.py
+!api/*.py
+
+# Exclude development files
+node_modules/
+.git/
+*.log
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Exclude documentation and screenshots
+*.md
+!README.md
+*.png
+*.pdf
+
+# Exclude Python files not in api directory
+extract_*.py
+fix_*.py
+update_*.py
+generate_*.py
+requirements.txt
+!api/requirements.txt
+
+# Exclude other unnecessary files
+bun.lockb
+start.bat
+start.ps1
+setup.ps1
+VolumeTracings.csv
