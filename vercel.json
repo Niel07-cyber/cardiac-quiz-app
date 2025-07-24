@@ -1,41 +1,18 @@
 {
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/questions.py": {
+      "runtime": "python3.12"
     },
-    {
-      "src": "api/questions.py",
-      "use": "@vercel/python"
+    "api/predict.py": {
+      "runtime": "python3.12"
     },
-    {
-      "src": "api/predict.py", 
-      "use": "@vercel/python"
+    "api/submit_results.py": {
+      "runtime": "python3.12"
     },
-    {
-      "src": "api/submit_results.py",
-      "use": "@vercel/python"
+    "api/index.py": {
+      "runtime": "python3.12"
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/questions",
-      "dest": "/api/questions.py"
-    },
-    {
-      "src": "/api/predict",
-      "dest": "/api/predict.py"
-    },
-    {
-      "src": "/api/submit_results",
-      "dest": "/api/submit_results.py"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/dist/$1"
-    }
-  ]
+  }
 }
